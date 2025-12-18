@@ -1,1 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qnovo Second-Life Readiness Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        /* Fixed Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #f59e42 0%, #1a365d 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #0f172a;
+        }
+
+        .logo-text .qnovo {
+            color: #f59e42;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Container */
+        .main-container {
+            margin-top: 70px;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            height: calc(100vh - 70px);
+        }
+
+        /* Left Panel - Input */
+        .input-panel {
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .required {
+            color: #f59e42;
+        }
+
+        select {
+            width: 100%;
+            padding: 11px 14px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: #0f172a;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #1a365d;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+        }
+
+        select option {
+            background: #ffffff;
+            color: #0f172a;
+        }
+
+        .input-hint {
+            display: none;
+        }
+
+        /* Recent Searches */
+        .recent-searches {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .searches-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .searches-dropdown {
+            width: 100%;
+            padding: 10px 14px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: #64748b;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .searches-dropdown:hover {
+            border-color: #1a365d;
+        }
+
+        .searches-dropdown:focus {
+            outline: none;
+            border-color: #1a365d;
+            box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #f59e42 0%, #d97706 100%);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+            box-shadow: 0 4px 12px rgba(245, 158, 66, 0.3);
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(245, 158, 66, 0.4);
+        }
+
+        .analyze-btn:active {
+            transform: translateY(0);
+        }
+
+        .analyze-btn.running {
+            background: linear-gradient(135deg, #1a365d 0%, #0f172a 100%);
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+        }
+
+        /* Right Panel - Results */
+        .results-panel {
+            background: #ffffff;
+            overflow-y: auto;
+            padding: 30px 40px;
+        }
+
+        /* Agent Status */
+        .agent-status {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .agent-status.idle {
+            padding: 60px 30px;
+        }
+
+        .agent-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(245, 158, 66, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+            color: #f59e42;
+        }
+
+        .agent-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .agent-subtitle {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .agent-status.running {
+            border-color: rgba(26, 54, 93, 0.3);
+            background: rgba(26, 54, 93, 0.05);
+            text-align: center;
+        }
+
+        .agent-status.running .agent-icon {
+            background: rgba(26, 54, 93, 0.15);
+            color: #1a365d;
+            animation: pulse-blue 1.5s infinite;
+        }
+
+        @keyframes pulse-blue {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .processing-steps {
+            margin-top: 12px;
+            min-height: 100px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e2e8f0;
+            opacity: 0;
+            animation: fadeInStep 0.4s forwards;
+        }
+
+        .step-item:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes fadeInStep {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(26, 54, 93, 0.1);
+            border: 2px solid rgba(26, 54, 93, 0.3);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 10px;
+            font-weight: 700;
+            color: #1a365d;
+        }
+
+        .step-text {
+            flex: 1;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.5;
+            padding-top: 2px;
+        }
+
+        .step-text strong {
+            color: #f59e42;
+            font-weight: 600;
+        }
+
+        /* Results Dashboard */
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+        }
+
+        .results-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .results-badge {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f59e42;
+            background: #ffffff;
+            padding: 6px 14px;
+            border-radius: 4px;
+            border: 1px solid #f59e42;
+        }
+
+        /* Cohort Summary */
+        .cohort-summary {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 14px;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        /* Readiness Breakdown */
+        .readiness-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .readiness-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .readiness-card {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .readiness-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .readiness-card.suitable {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .readiness-card.derated {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .readiness-card.not-recommended {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .readiness-percentage {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .readiness-card.suitable .readiness-percentage {
+            color: #10b981;
+        }
+
+        .readiness-card.derated .readiness-percentage {
+            color: #f59e0b;
+        }
+
+        .readiness-card.not-recommended .readiness-percentage {
+            color: #ef4444;
+        }
+
+        .readiness-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .readiness-count {
+            font-size: 14px;
+            color: #475569;
+        }
+
+        /* Key Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a365d;
+        }
+
+        .metric-unit {
+            font-size: 14px;
+            color: #64748b;
+            margin-left: 4px;
+        }
+
+        /* Custom Notifications */
+        .notification {
+            position: fixed;
+            top: 90px;
+            right: 30px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            min-width: 320px;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.error {
+            border-left: 3px solid #ef4444;
+        }
+
+        .notification.success {
+            border-left: 3px solid #10b981;
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .notification-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .notification.error .notification-icon {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .notification.success .notification-icon {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #0f172a;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        /* Scrollbar Styling */
+        .input-panel::-webkit-scrollbar,
+        .results-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .input-panel::-webkit-scrollbar-track,
+        .results-panel::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+
+        .input-panel::-webkit-scrollbar-thumb,
+        .results-panel::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .input-panel::-webkit-scrollbar-thumb:hover,
+        .results-panel::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-panel {
+                height: auto;
+            }
+
+            .readiness-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">Q</div>
+            <div class="logo-text">
+                <span class="qnovo">Qnovo</span> Second-Life Readiness Agent
+            </div>
+        </div>
+        <div class="header-status">
+            <div class="status-indicator"></div>
+            <span>System Online</span>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Panel - Input -->
+        <div class="input-panel">
+            <div class="panel-title">Battery Analysis Parameters</div>
+            
+            <!-- Recent Searches -->
+            <div class="recent-searches">
+                <div class="searches-label">Recent Searches</div>
+                <select class="searches-dropdown" id="recentSearchSelect">
+                    <option value="">Select a recent search...</option>
+                    <option value="demo">IONIQ 5, 2021-2022, Long Range, Data Center UPS</option>
+                </select>
+            </div>
+            
+            <form id="analysisForm">
+                <div class="form-group">
+                    <label>Vehicle Program <span class="required">*</span></label>
+                    <select id="vehicleProgram" required>
+                        <option value="">Select vehicle program...</option>
+                        <option value="ioniq5">IONIQ 5</option>
+                        <option value="kona">Kona EV</option>
+                        <option value="ioniq6">IONIQ 6</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Model Year Range <span class="required">*</span></label>
+                    <select id="modelYear" required>
+                        <option value="">Select year range...</option>
+                        <option value="2021-2022">2021–2022</option>
+                        <option value="2023-2024">2023–2024</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Pack Variant <span class="required">*</span></label>
+                    <select id="packVariant" required>
+                        <option value="">Select pack variant...</option>
+                        <option value="standard">Standard Range</option>
+                        <option value="long">Long Range</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Intended Second-Life Use <span class="required">*</span></label>
+                    <select id="secondLifeUse" required>
+                        <option value="">Select intended use...</option>
+                        <option value="datacenter">Data Center Backup Power (UPS)</option>
+                        <option value="commercial">Commercial Backup Power</option>
+                        <option value="grid">Energy Storage (Grid / Peak Shaving)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="analyze-btn" id="analyzeBtn">Run Agent</button>
+            </form>
+        </div>
+
+        <!-- Right Panel - Results -->
+        <div class="results-panel">
+            <!-- Agent Status -->
+            <div class="agent-status idle" id="agentStatus">
+                <div class="agent-icon">🔋</div>
+                <div class="agent-title">Agent Ready</div>
+                <div class="agent-subtitle">Select parameters to begin battery cohort analysis</div>
+            </div>
+
+            <!-- Results Container -->
+            <div id="resultsContainer" style="display: none;">
+                <!-- Results Header -->
+                <div class="results-header">
+                    <div class="results-title">Cohort Analysis Summary</div>
+                    <div class="results-badge" id="confidenceBadge">High Confidence</div>
+                </div>
+
+                <!-- Cohort Summary -->
+                <div class="cohort-summary" id="cohortSummary">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <!-- Readiness Breakdown -->
+                <div class="readiness-section">
+                    <div class="section-title">Readiness Breakdown</div>
+                    <div class="readiness-cards" id="readinessCards">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="readiness-section">
+                    <div class="section-title">Key Metrics</div>
+                    <div class="metrics-grid" id="metricsGrid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom notification function
+        function showNotification(type, title, message) {
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icons = {
+                error: '✕',
+                success: '✓'
+            };
+
+            notification.innerHTML = `
+                <div class="notification-header">
+                    <div class="notification-icon">${icons[type]}</div>
+                    <div class="notification-title">${title}</div>
+                </div>
+                <div class="notification-message">${message}</div>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Recent Searches handler
+        document.getElementById('recentSearchSelect').addEventListener('change', function(e) {
+            const value = e.target.value;
+            
+            if (value === 'demo') {
+                // Populate form with demo example
+                document.getElementById('vehicleProgram').value = 'ioniq5';
+                document.getElementById('modelYear').value = '2021-2022';
+                document.getElementById('packVariant').value = 'long';
+                document.getElementById('secondLifeUse').value = 'datacenter';
+            }
+            
+            // Reset dropdown
+            e.target.value = '';
+        });
+
+        // Form submission handler
+        document.getElementById('analysisForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = {
+                vehicleProgram: document.getElementById('vehicleProgram').value,
+                modelYear: document.getElementById('modelYear').value,
+                packVariant: document.getElementById('packVariant').value,
+                secondLifeUse: document.getElementById('secondLifeUse').value
+            };
+
+            // Validate all fields are filled
+            if (!formData.vehicleProgram || !formData.modelYear || !formData.packVariant || !formData.secondLifeUse) {
+                showNotification('error', 'Missing Information', 'Please fill in all required fields to begin analysis.');
+                return;
+            }
+
+            // Update UI to running state
+            const agentStatus = document.getElementById('agentStatus');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            agentStatus.className = 'agent-status running';
+            analyzeBtn.classList.add('running');
+            analyzeBtn.textContent = 'Analyzing...';
+            resultsContainer.style.display = 'none';
+            
+            // Show processing steps
+            const processingSteps = [
+                { num: '1', text: 'Validating input parameters and checking data availability...', delay: 200 },
+                { num: '2', text: `Querying cohort: <strong>${getVehicleName(formData.vehicleProgram)} ${formData.modelYear}</strong>...`, delay: 700 },
+                { num: '3', text: 'Analyzing battery health metrics across fleet data...', delay: 1200 },
+                { num: '4', text: `Computing readiness for <strong>${getUseCaseName(formData.secondLifeUse)}</strong>...`, delay: 1700 },
+                { num: '5', text: 'Generating summary and risk assessment...', delay: 2200 }
+            ];
+
+            agentStatus.innerHTML = `
+                <div class="agent-icon">🔋</div>
+                <div class="agent-title">Agent Processing</div>
+                <div class="agent-subtitle">Analyzing battery cohort across integrated data sources...</div>
+                <div class="processing-steps" id="processingSteps"></div>
+            `;
+
+            const stepsContainer = document.getElementById('processingSteps');
+            processingSteps.forEach((step, index) => {
+                setTimeout(() => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'step-item';
+                    stepDiv.innerHTML = `
+                        <div class="step-icon">${step.num}</div>
+                        <div class="step-text">${step.text}</div>
+                    `;
+                    stepsContainer.appendChild(stepDiv);
+                }, step.delay);
+            });
+
+            try {
+                // Call N8N webhook
+                const response = await fetch('https://jado2003.app.n8n.cloud/webhook/073fdd5a-7321-417b-9347-c27c3ba6815c', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                // Check for errors
+                if (data.error || !data.success) {
+                    agentStatus.className = 'agent-status idle';
+                    agentStatus.innerHTML = `
+                        <div class="agent-icon">🔋</div>
+                        <div class="agent-title">Agent Ready</div>
+                        <div class="agent-subtitle">Select parameters to begin battery cohort analysis</div>
+                    `;
+                    analyzeBtn.classList.remove('running');
+                    analyzeBtn.textContent = 'Run Agent';
+                    
+                    showNotification('error', 'Analysis Error', data.message || 'Unknown error occurred. Please try again.');
+                    return;
+                }
+
+                // Show results after processing
+                setTimeout(() => {
+                    displayResults(data.results);
+                    agentStatus.className = 'agent-status idle';
+                    agentStatus.innerHTML = `
+                        <div class="agent-icon">✓</div>
+                        <div class="agent-title">Analysis Complete</div>
+                        <div class="agent-subtitle">Results displayed below</div>
+                    `;
+                    analyzeBtn.classList.remove('running');
+                    analyzeBtn.textContent = 'Run Agent';
+                }, 2800);
+
+            } catch (error) {
+                console.error('Error:', error);
+                agentStatus.className = 'agent-status idle';
+                agentStatus.innerHTML = `
+                    <div class="agent-icon">🔋</div>
+                    <div class="agent-title">Agent Ready</div>
+                    <div class="agent-subtitle">Select parameters to begin battery cohort analysis</div>
+                `;
+                analyzeBtn.classList.remove('running');
+                analyzeBtn.textContent = 'Run Agent';
+                
+                showNotification('error', 'Connection Error', 'Unable to connect to analysis system. Please try again.');
+            }
+        });
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.style.display = 'block';
+            
+            // Populate cohort summary
+            const cohortSummary = document.getElementById('cohortSummary');
+            cohortSummary.innerHTML = `
+                <div class="summary-row">
+                    <span class="summary-label">Battery packs analyzed:</span>
+                    <span class="summary-value">${results.totalPacks.toLocaleString()}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Second-life use evaluated:</span>
+                    <span class="summary-value">${results.useCase}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Confidence level:</span>
+                    <span class="summary-value">${results.confidenceLevel}</span>
+                </div>
+            `;
+
+            // Update confidence badge
+            document.getElementById('confidenceBadge').textContent = `${results.confidenceLevel} Confidence`;
+
+            // Populate readiness cards
+            const readinessCards = document.getElementById('readinessCards');
+            readinessCards.innerHTML = `
+                <div class="readiness-card suitable">
+                    <div class="readiness-percentage">${results.readiness.suitable.percentage}%</div>
+                    <div class="readiness-label">Suitable</div>
+                    <div class="readiness-count">${results.readiness.suitable.count.toLocaleString()} packs</div>
+                </div>
+                <div class="readiness-card derated">
+                    <div class="readiness-percentage">${results.readiness.derated.percentage}%</div>
+                    <div class="readiness-label">Derated / Limited Use</div>
+                    <div class="readiness-count">${results.readiness.derated.count.toLocaleString()} packs</div>
+                </div>
+                <div class="readiness-card not-recommended">
+                    <div class="readiness-percentage">${results.readiness.notRecommended.percentage}%</div>
+                    <div class="readiness-label">Not Recommended</div>
+                    <div class="readiness-count">${results.readiness.notRecommended.count.toLocaleString()} packs</div>
+                </div>
+            `;
+
+            // Populate metrics
+            const metricsGrid = document.getElementById('metricsGrid');
+            metricsGrid.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-label">Median State of Health</div>
+                    <div class="metric-value">${results.metrics.medianSoH}<span class="metric-unit">%</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Health Variance</div>
+                    <div class="metric-value">±${results.metrics.healthVariance}<span class="metric-unit">%</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Estimated Remaining Life</div>
+                    <div class="metric-value">${results.metrics.remainingLife}<span class="metric-unit">years</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Risk Flag Rate</div>
+                    <div class="metric-value">${results.metrics.riskFlagRate}<span class="metric-unit">%</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Estimated Usable Capacity</div>
+                    <div class="metric-value">${results.metrics.usableCapacity}<span class="metric-unit">MWh</span></div>
+                </div>
+            `;
+        }
+
+        function getVehicleName(program) {
+            const names = {
+                'ioniq5': 'IONIQ 5',
+                'kona': 'Kona EV',
+                'ioniq6': 'IONIQ 6'
+            };
+            return names[program] || program;
+        }
+
+        function getUseCaseName(useCase) {
+            const names = {
+                'datacenter': 'Data Center Backup Power (UPS)',
+                'commercial': 'Commercial Backup Power',
+                'grid': 'Energy Storage (Grid / Peak Shaving)'
+            };
+            return names[useCase] || useCase;
+        }
+    </script>
+</body>
+</html>
