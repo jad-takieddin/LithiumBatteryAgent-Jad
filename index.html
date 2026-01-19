@@ -770,6 +770,11 @@
             align-items: center;
             gap: 12px;
         }
+        
+        .compliance-item.safety-highlight {
+            border-color: var(--border-gold);
+            background: rgba(201, 169, 97, 0.05);
+        }
 
         .compliance-icon {
             font-size: 20px;
@@ -1194,6 +1199,9 @@
                 
                 const N8N_WEBHOOK_URL = 'https://jado2003.app.n8n.cloud/webhook/qnovo-battery-agent';
                 
+                console.log('Sending request to:', N8N_WEBHOOK_URL);
+                console.log('Form data:', formData);
+                
                 const response = await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
@@ -1201,6 +1209,16 @@
                     },
                     body: JSON.stringify(formData)
                 });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Check if response is ok
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response text:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+                }
 
                 const data = await response.json();
 
@@ -1296,38 +1314,42 @@
                 </div>
             `;
 
-            // Build Insight Cards HTML
-            const cardsHTML = results.cards.map(card => `
-                <div class="insight-card">
-                    <div class="card-header">
-                        <div class="card-title-section">
-                            <div class="card-title">${card.title}</div>
-                            <div class="card-subtitle">${card.subtitle}</div>
-                        </div>
-                        <div class="card-risk-rating ${card.riskRating.toLowerCase()}">${card.riskRating} Risk</div>
-                    </div>
+            // Build Insight Cards HTML - wrapped in container for proper spacing
+            const cardsHTML = `
+                <div class="insight-cards">
+                    ${results.cards.map(card => `
+                        <div class="insight-card">
+                            <div class="card-header">
+                                <div class="card-title-section">
+                                    <div class="card-title">${card.title}</div>
+                                    <div class="card-subtitle">${card.subtitle}</div>
+                                </div>
+                                <div class="card-risk-rating ${card.riskRating.toLowerCase()}">${card.riskRating} Risk</div>
+                            </div>
 
-                    <div class="card-section">
-                        <div class="section-label">📊 Top Patterns Observed</div>
-                        <div class="pattern-list">
-                            ${card.topPatterns.map(pattern => `
-                                <div class="pattern-item">${pattern}</div>
-                            `).join('')}
-                        </div>
-                    </div>
+                            <div class="card-section">
+                                <div class="section-label">📊 Top Patterns Observed</div>
+                                <div class="pattern-list">
+                                    ${card.topPatterns.map(pattern => `
+                                        <div class="pattern-item">${pattern}</div>
+                                    `).join('')}
+                                </div>
+                            </div>
 
-                    <div class="card-section">
-                        <div class="section-label">⚠️ Early Signals to Monitor</div>
-                        <div class="signal-list">
-                            ${card.earlySignals.map(signal => `
-                                <div class="signal-item">${signal}</div>
-                            `).join('')}
+                            <div class="card-section">
+                                <div class="section-label">⚠️ Early Signals to Monitor</div>
+                                <div class="signal-list">
+                                    ${card.earlySignals.map(signal => `
+                                        <div class="signal-item">${signal}</div>
+                                    `).join('')}
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
 
-            // Build Compliance HTML
+            // Build Compliance HTML - improved styling
             const complianceHTML = `
                 <div class="compliance-section">
                     <div class="compliance-title">
@@ -1344,13 +1366,13 @@
                                 </div>
                             </div>
                         `).join('')}
-                    </div>
-
-                    <div class="safety-readiness">
-                        <div class="safety-icon">${results.compliance.safetyReadiness.icon}</div>
-                        <div class="safety-details">
-                            <div class="safety-framework">${results.compliance.safetyReadiness.framework}</div>
-                            <div class="safety-status">Status: ${results.compliance.safetyReadiness.status}</div>
+                    
+                        <div class="compliance-item safety-highlight">
+                            <div class="compliance-icon">${results.compliance.safetyReadiness.icon}</div>
+                            <div class="compliance-details">
+                                <div class="compliance-region">${results.compliance.safetyReadiness.framework}</div>
+                                <div class="compliance-status">${results.compliance.safetyReadiness.status}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
