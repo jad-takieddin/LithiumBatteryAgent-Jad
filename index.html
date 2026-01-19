@@ -1188,8 +1188,13 @@
             });
 
             try {
-                // Call n8n webhook - REPLACE WITH YOUR ACTUAL WEBHOOK URL
-                const response = await fetch('YOUR_N8N_WEBHOOK_URL_HERE', {
+                // ============================================
+                // n8n WEBHOOK URL - CONNECTED!
+                // ============================================
+                
+                const N8N_WEBHOOK_URL = 'https://jado2003.app.n8n.cloud/webhook/qnovo-battery-agent';
+                
+                const response = await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
